@@ -12,9 +12,16 @@ I need this code, just don't know where, perhaps should make some middleware, do
 
 Go code!
 */
-require('dotenv').config();
+// require('dotenv').config();
 const server = require("./server"); 
+const port = process.env.PORT || 8000;
 
-server.listen(process.env.PORT, () => {
-    console.log('server is listening on ' + (process.env.PORT));
+// server.listen(process.env.PORT, () => {
+//     console.log('server is listening on ' + (process.env.PORT));
+// });
+
+server.listen(port, () => {
+    console.log(
+      `SERVER IS LISTENING ON PORT ${port}`
+    );
 });
