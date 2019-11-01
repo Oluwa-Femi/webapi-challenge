@@ -1,25 +1,15 @@
-const express = require("express");
-const cors = require("cors");
-const helmet = require("helmet");
+const express = require('express');
 const server = express();
-const projectsRouter = require("./projectsRouter.js");
-const actionsRouter = require("./actionsRouter.js");
+const cors = require('cors');
+const helmet = require('helmet');
+const projectsRouter = require('./routes/projectsRoutes');
+const actionsRoute = require('./routes/actionRoutes');
 
-server.use(logger);
+server.use(cors());
 server.use(helmet());
 server.use(express.json());
-server.use(cors())
-server.use("/api/projects", projectsRouter)
-server.use("/api/actions", actionsRouter)
 
-// middleware
-function logger(req, res, next) {
-    console.log(`${req.method} to ${req.path}`)
-    next()
-}
+server.use('/api/projects', projectsRouter);
+server.use('/api/actions', actionsRoute);
 
-server.get("/", (req, res) => {
-    res.status(200).json({ message: "Server is working" });
-  });
-  
 module.exports = server;
