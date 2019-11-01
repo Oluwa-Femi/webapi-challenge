@@ -2,13 +2,13 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const server = express();
-const router = require("./router.js");
+const projectsRouter = require("./projectsRouter.js");
 
 server.use(logger);
 server.use(helmet());
 server.use(express.json());
 server.use(cors())
-server.use("/api/projects", router)
+server.use("/api/projects", projectsRouter)
 
 // middleware
 function logger(req, res, next) {
