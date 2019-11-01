@@ -1,20 +1,16 @@
 const express = require("express"); 
 
-const projectModel = require("./data/helpers/projectModel.js");
-
-// import middleware below 
-
-const validateProjects = require("./auth/validateProjects.js");
-const validateProjectsUpdate = require("./auth/validateProjectsUpdate.js");  
+const projectModel = require("./data/helpers/projectModel");
+const actionModel = require("./data/helpers/actionModel");
+const db = require("./data/dbConfig.js");
+const validateProjects = require("./auth/validateProjects");  
 // import middleware above
 
-// const router = express.Router(); 
-
-const router = express(); 
-router.use(express.json())
+const router = express.Router(); 
+// router.use(express.json());
 
 
-
+//fetching project information using get()
 router.get("/", (req, res) => {
     projectModel
     .get()
@@ -28,14 +24,14 @@ router.get("/", (req, res) => {
 }) 
 
 
-// .post() users from projects 
+// creating new name and description using post()
 router.post("/", validateProjects, (req, res) => {
     const body = req.body; 
 
     projectModel
     .insert(body)
-    .then(students => {
-        res.status(200).json(students)
+    .then(project => {
+        res.status(200).json(project)
     })
     .catch(error => {
         console.log(error)
@@ -45,7 +41,6 @@ router.post("/", validateProjects, (req, res) => {
 
 router.get("/:id", (req, res) => {
     const { id } = req.params; 
-
     projectModel
     .get(id)
     .then(project => {
@@ -59,24 +54,36 @@ router.get("/:id", (req, res) => {
         console.log(error)
         res.status(500).json({error: "error with server"})
     })
-
-
 })
 
-router.put("/:id", validateProjectsUpdate, (req, res) => {
+// .put() editing the specific projects with ID 
+router.put('/:id', (req, res) => {
     const { id } = req.params; 
+    const edit = req.body;
+
+    if(!edit.name && !edit.description){
+        res.status(400).json({message: "Please include a name or a description with maximum 128 characters"})
+    } else {
 
     projectModel
-    .update(id)
-    .then(edit => {
-        res.status(200).json(edit)
-    })
-    .catch(error => {
-        console.log(error)
-        res.status(500).json({error: "error with server"})
-    })
-})
 
+    .update(id, edit)
+        .then(projects => {
+            if(projects) {
+                
+                res.status(200).json(projects);
+            } else {
+                res.status(404).json({message: "Project with specified id not found"});
+            };
+        })
+        .catch(err => {
+            console.log("Edit Project Error:", err)
+            res.status(500).json({error: "Error with server while updating data"})
+        });
+    }
+});
+
+// .delete() deleting projects
 router.delete("/:id", (req, res) => {
     const { id } = req.params; 
 
@@ -95,13 +102,13 @@ router.delete("/:id", (req, res) => {
     })
 })
 
-router.get("/:project_id/actions", (req, res) => {
-    const project_id = req.params.project_id; 
+router.get("/:id/actions", (req, res) => {
+    const { id } = req.params;  
 
     projectModel
-    .getProjectActions(project_id)
-    .then(projectActions => {
-        res.status(200).json(projectActions)
+    .getProjectActions(id)
+    .then(actions => {
+        res.status(200).json(actions)
     })
     .catch(error => {
         console.log(error)
